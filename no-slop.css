@@ -1,11 +1,15 @@
 /* Final readability / responsive QA layer. Keep this last in the cascade. */
 html,body{max-width:100%;overflow-x:clip}
 #app,.page,.home-page,.section,.container,.x-expanded-view{min-width:0}
-.x-archive-layout>*,.x-dossier-layout>*,.x-timeline-body>*,.x-page-hero-grid>*,.section-head>*,.hero-grid>*{min-width:0}
+.x-archive-layout>*,.x-dossier-layout>*,.x-timeline-body>*,.x-page-hero-grid>*,.section-head>*,.hero-grid>*,.oa-grid>*,.dossier-grid>*,.sector-layout>*,.construct-wrap>*{min-width:0}
+.archive-grid>*,.villain-grid>*,.reading-grid>*,.source-grid>*,.archive-rail>*{min-width:0}
 
 /* Prevent long names and display copy from colliding with neighboring UI. */
-.x-page-hero h1,.x-dossier-title h1,.x-dossier-section h2,.x-timeline-dossier h2,.x-card-body h3,.section-head h2,.hero-title,.oa-info h3{overflow-wrap:anywhere;word-break:normal;text-wrap:balance}
+.x-page-hero h1,.page-hero h1,.x-dossier-title h1,.x-dossier-section h2,.x-timeline-dossier h2,.x-card-body h3,.section-head h2,.hero-title,.oa-info h3{overflow-wrap:anywhere;word-break:normal;text-wrap:balance}
 .x-page-hero h1{line-height:.9;letter-spacing:-.045em;max-width:14ch}
+.page-hero h1{line-height:.94;letter-spacing:-.045em;max-width:15ch}
+.hero-title{line-height:.9;letter-spacing:-.04em}
+.section-head h2{line-height:.98}
 .x-dossier-title h1{line-height:.88;letter-spacing:-.05em;max-width:11ch}
 .x-card-body h3{line-height:1;letter-spacing:-.035em}
 .x-dossier-section h2,.x-timeline-dossier h2{line-height:1.04;letter-spacing:-.035em}
@@ -13,17 +17,23 @@ html,body{max-width:100%;overflow-x:clip}
 
 /* Let metadata wrap naturally instead of fighting for one line. */
 .x-card-kicker,.x-card-meta,.x-dossier-badges,.hero-meta,.button-row,.x-archive-toolbar{flex-wrap:wrap;row-gap:8px}
-.x-card-kicker>*{min-width:0}
-.x-status,.x-card-meta span,.x-tags span,.x-rel-group a,.x-rel-group span,.button,.oa-node{overflow-wrap:anywhere;white-space:normal}
+.x-card-kicker>*,.hero-meta>*,.button-row>*{min-width:0}
+.x-status,.x-card-meta span,.x-tags span,.x-rel-group a,.x-rel-group span,.button,.oa-node,.site-nav a{overflow-wrap:anywhere;white-space:normal}
 .x-archive-toolbar{gap:12px;align-items:center}
 .x-archive-toolbar>*{min-width:0}
 
-/* Cards should grow from their content rather than forcing text into a fixed box. */
+/* Cards and grids grow from content rather than forcing text into fixed boxes. */
 .x-lantern-card{min-height:0}
 .x-card-body{display:flex;flex-direction:column;min-width:0}
 .x-card-link{margin-top:auto;padding-top:8px}
-.x-gallery-item{min-width:0}
-.x-source-list a{min-width:0;overflow-wrap:anywhere}
+.x-gallery-item,.lantern-card,.archive-card,.villain-card,.reading-card,.source-card{min-width:0}
+.x-source-list a,.source-card,.reading-card{overflow-wrap:anywhere}
+.card-copy,.archive-card,.villain-card,.reading-card,.source-card{overflow-wrap:anywhere}
+
+/* Base homepage statistics stay readable at every width. */
+.stat{min-width:0}
+.stat strong,.stat span{overflow-wrap:anywhere;word-break:normal}
+.stat span{line-height:1.35;display:block}
 
 /* Timeline readability: fewer competing sticky layers and safer content widths. */
 .x-year-rail{max-width:100%;overscroll-behavior-x:contain}
@@ -40,9 +50,11 @@ html,body{max-width:100%;overflow-x:clip}
 .x-ring-spec{letter-spacing:.08em;text-transform:none;max-width:220px;line-height:1.35}
 .x-ring-spec small{font-size:9px}
 
-/* The Corps rail should remain legible instead of truncating the emotion names. */
+/* The Corps rail stays legible instead of truncating emotion names. */
 .x-corps-chip small{white-space:normal;overflow:visible;text-overflow:clip;min-height:2.2em;text-align:center}
 .x-corps-chip b{line-height:1.25;overflow-wrap:anywhere}
+.spectrum-band{min-width:0}
+.spectrum-band strong,.spectrum-band span{overflow-wrap:anywhere}
 
 /* Keep Oa controls away from the battery core and allow labels to wrap. */
 .oa-scene.x-battery-scene .oa-node{max-width:min(180px,34%);line-height:1.25;text-align:center;letter-spacing:.08em}
@@ -59,6 +71,9 @@ html,body{max-width:100%;overflow-x:clip}
   .container{width:min(var(--max),calc(100% - 28px))}
   .section{padding-block:clamp(64px,15vw,92px)}
   .x-ui-organized .x-organized-section{padding-block:clamp(54px,13vw,78px)}
+  .section-head{gap:22px}
+  .section-head h2{font-size:clamp(34px,11vw,58px);line-height:1}
+  .page-hero h1{font-size:clamp(44px,13vw,72px);max-width:100%}
   .x-page-hero{padding-top:108px;padding-bottom:38px}
   .x-page-hero h1{font-size:clamp(44px,13vw,72px);line-height:.94;letter-spacing:-.035em;max-width:100%}
   .x-dossier-hero{min-height:600px}
@@ -89,10 +104,11 @@ html,body{max-width:100%;overflow-x:clip}
 @media(max-width:520px){
   .site-header{padding-inline:14px}
   .brand{gap:10px}.brand small{display:none}
+  .site-nav{left:10px;right:10px}
   .hero{padding-top:100px}
   .hero-title{font-size:clamp(3rem,15vw,4.6rem);line-height:.9;letter-spacing:-.035em}
   .hero-meta{gap:10px;font-size:.58rem;letter-spacing:.1em}
-  .x-page-hero h1{font-size:clamp(40px,12.5vw,60px)}
+  .page-hero h1,.x-page-hero h1{font-size:clamp(40px,12.5vw,60px)}
   .x-dossier-title h1{font-size:clamp(46px,15vw,76px)}
   .x-rel-group a,.x-rel-group span,.x-tags span{max-width:100%}
   .x-corps-spectrum-rail{margin-inline:-2px}
@@ -101,6 +117,15 @@ html,body{max-width:100%;overflow-x:clip}
   .oa-scene.x-battery-scene{min-height:520px}
   .oa-scene.x-battery-scene .oa-node{max-width:45%;font-size:.52rem;letter-spacing:.06em}
   .x-battery-caption{bottom:-7%}
+  .button{max-width:100%;line-height:1.25;text-align:center;justify-content:center;padding-block:10px}
+}
+
+@media(max-width:420px){
+  .stats{grid-template-columns:1fr}
+  .stat{border-right:0!important;border-bottom:1px solid var(--line)!important;padding:20px 14px}
+  .stat:last-child{border-bottom:0!important}
+  .hero-meta{grid-template-columns:1fr}
+  .x-ring-spec{display:none}
 }
 
 @media(prefers-reduced-motion:reduce){
