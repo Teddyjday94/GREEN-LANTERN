@@ -1,0 +1,12 @@
+{
+  "name": "green-lantern-fan-archive",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "python3 -m http.server 4173",
+    "test": "node --test tests/*.test.mjs",
+    "typecheck": "node --check app.mjs && node --check data.mjs && node --check search.mjs && node --check router.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}
