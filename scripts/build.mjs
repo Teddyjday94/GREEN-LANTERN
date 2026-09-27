@@ -7,7 +7,8 @@ for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs',
   await copyFile(new URL(`../${file}`,import.meta.url),new URL(file,dist));
 }
 await mkdir(new URL('vendor/', dist), { recursive: true });
-await copyFile(new URL('../node_modules/three/build/three.module.min.js', import.meta.url), new URL('vendor/three.module.min.js', dist));
+await copyFile(new URL('../node_modules/three/build/three.module.js', import.meta.url), new URL('vendor/three.module.js', dist));
+await copyFile(new URL('../node_modules/three/build/three.core.js', import.meta.url), new URL('vendor/three.core.js', dist));
 const rawSite = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:4173');
 const site = rawSite.replace(/\/$/,'');
 const routes = ['','lanterns','corps','universe','spectrum','timeline','villains','reading','sources',...lanternRecords.map(l=>`lanterns/${l.slug}`)];

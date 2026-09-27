@@ -19,7 +19,7 @@ export function supportsWebGL() {
 export async function mountPowerRing({container,reducedMotion=false,signal}={}) {
   if (!container || !supportsWebGL() || signal?.aborted) return null;
   try {
-    const THREE = await import('/vendor/three.module.min.js');
+    const THREE = await import('/vendor/three.module.js');
     if (signal?.aborted) return null;
     const profile=getRingQualityProfile({width:container.clientWidth||innerWidth,devicePixelRatio:globalThis.devicePixelRatio||1,reducedMotion});
     const scene=new THREE.Scene();
@@ -69,7 +69,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
 
     let targetX=0,targetY=0,scrollY=0,pulseBoost=0,raf=0,first=true;
     const pointer=(e)=>{ const rect=container.getBoundingClientRect(); targetY=((e.clientX-rect.left)/rect.width-.5)*0.32; targetX=((e.clientY-rect.top)/rect.height-.5)*0.2; };
-    const scroll=()=>{ if(profile.scrollMotion) scrollY=Math.min(1,Math.max(0,scrollY=globalThis.scrollY/(globalThis.innerHeight||800))); };
+    const scroll=()=>{ if(profile.scrollMotion) scrollY=Math.min(1,Math.max(0,globalThis.scrollY/(globalThis.innerHeight||800))); };
     const resize=()=>{ const w=Math.max(1,container.clientWidth),h=Math.max(1,container.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); };
     container.addEventListener('pointermove',pointer,{passive:true}); globalThis.addEventListener?.('scroll',scroll,{passive:true}); globalThis.addEventListener?.('resize',resize,{passive:true}); resize();
 
