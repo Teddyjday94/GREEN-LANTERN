@@ -1,0 +1,5 @@
+import test from 'node:test'; import assert from 'node:assert/strict';
+import {lanternRecords} from '../expansion-data.mjs'; import {searchExpandedLanterns} from '../expansion-search.mjs';
+for(const [query,slug] of [['Sector 2814','hal-jordan'],['White Lantern','kyle-rayner'],['Xudar','tomar-re'],['Honor Guard','tomar-re'],['architect','john-stewart'],['Far Sector','jo-mullein'],['Emerald Twilight','kyle-rayner'],['Torchbearer','kyle-rayner'],['Korugar','soranik-natu'],['training','kilowog']]) test(`search resolves ${query}`,()=>assert.ok(searchExpandedLanterns(lanternRecords,query,{}).some(r=>r.slug===slug)));
+test('facets combine archive sector status and species',()=>{ const r=searchExpandedLanterns(lanternRecords,'',{archives:['cosmic'],sectors:['2813'],statuses:['honor-guard'],species:['Xudarian']}); assert.deepEqual(r.map(x=>x.slug),['tomar-re']); });
+test('sparse records do not throw',()=>assert.deepEqual(searchExpandedLanterns([{slug:'x',name:'Sparse'}],'sparse',{}).map(x=>x.slug),['x']));
