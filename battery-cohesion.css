@@ -1,0 +1,332 @@
+/* Central Power Battery cohesion pass */
+.oa-scene.x-battery-scene{
+  background:
+    radial-gradient(circle at 50% 47%,rgba(67,255,132,.11),transparent 24%),
+    radial-gradient(ellipse at 50% 90%,rgba(38,255,108,.06),transparent 37%),
+    linear-gradient(180deg,#03110b 0%,#020a07 62%,#010604 100%);
+}
+
+.x-central-battery{
+  width:min(390px,70%);
+  height:min(565px,84%);
+  top:49%;
+  filter:drop-shadow(0 34px 42px rgba(0,0,0,.5));
+}
+
+.x-central-battery.is-compact{
+  width:min(320px,68%);
+  height:min(470px,78%);
+}
+
+.x-battery-aura{
+  width:118%;
+  top:52%;
+  opacity:.48;
+  filter:blur(18px);
+  background:radial-gradient(circle,rgba(150,255,187,.16) 0 10%,rgba(55,255,126,.12) 26%,rgba(33,255,106,.04) 46%,transparent 68%);
+  animation:x-battery-cohesion-breathe 5.8s ease-in-out infinite;
+}
+
+.x-battery-light-column{
+  top:8%;
+  bottom:8%;
+  width:22%;
+  opacity:.58;
+  filter:blur(18px);
+  background:linear-gradient(90deg,transparent,rgba(118,255,166,.06),rgba(222,255,232,.15),rgba(118,255,166,.06),transparent);
+}
+
+.x-battery-floor-rings{
+  left:50%;
+  bottom:1%;
+  width:94%;
+  height:15%;
+  opacity:.2;
+  transform:translateX(-50%) perspective(650px) rotateX(70deg);
+}
+
+.x-battery-floor-rings i,
+.x-battery-floor-rings i:nth-child(n){
+  width:100%;
+  border-color:rgba(111,255,159,.34);
+  box-shadow:0 0 24px rgba(53,255,122,.16),inset 0 0 20px rgba(53,255,122,.06);
+  opacity:1;
+}
+
+.x-battery-frame,
+.x-battery-reactor{
+  position:absolute;
+  left:50%;
+  top:3%;
+  bottom:7%;
+  width:72%;
+  transform:translateX(-50%);
+  z-index:4;
+  border:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+}
+
+.x-battery-frame:before,
+.x-battery-frame:after{
+  content:"";
+  position:absolute;
+  left:7%;
+  right:7%;
+  height:7.5%;
+  z-index:8;
+  border:1px solid rgba(143,255,181,.16);
+  background:linear-gradient(180deg,#176f45 0%,#0a422a 48%,#042519 100%);
+  box-shadow:inset 0 1px 0 rgba(208,255,224,.06),0 8px 20px rgba(0,0,0,.34);
+}
+
+.x-battery-frame:before{
+  top:24%;
+  border-radius:48% 48% 22% 22%/62% 62% 30% 30%;
+}
+
+.x-battery-frame:after{
+  bottom:17%;
+  border-radius:24% 24% 48% 48%/30% 30% 62% 62%;
+}
+
+.x-battery-arch,
+.x-battery-crown{
+  position:absolute;
+  left:13%;
+  right:13%;
+  top:0;
+  height:31%;
+  z-index:3;
+  border:clamp(14px,2.6vw,19px) solid #0a4029;
+  border-bottom:0;
+  border-radius:50% 50% 0 0/64% 64% 0 0;
+  background:none;
+  box-shadow:inset 0 0 0 2px rgba(132,255,175,.045),0 0 0 1px rgba(0,0,0,.45);
+}
+
+.x-battery-arch:before,
+.x-battery-crown:before,
+.x-battery-crown:after{
+  content:none;
+}
+
+.x-battery-arch-inner{
+  position:absolute;
+  inset:9px 8px 0;
+  border:1px solid rgba(127,255,171,.11);
+  border-bottom:0;
+  border-radius:inherit;
+}
+
+.x-battery-side-rail,
+.x-battery-brace{
+  position:absolute;
+  top:25%;
+  bottom:17%;
+  width:14%;
+  z-index:7;
+  clip-path:none;
+  border:1px solid rgba(138,255,178,.13);
+  background:linear-gradient(90deg,#031c13 0%,#0a3b28 22%,#126440 52%,#082f21 78%,#021810 100%);
+  box-shadow:inset 0 0 15px rgba(0,0,0,.4),0 8px 18px rgba(0,0,0,.22);
+}
+
+.x-battery-side-rail-left,
+.x-battery-brace-left{
+  left:8%;
+  border-radius:42% 14% 18% 36%/8% 5% 8% 10%;
+}
+
+.x-battery-side-rail-right,
+.x-battery-brace-right{
+  right:8%;
+  left:auto;
+  transform:none;
+  border-radius:14% 42% 36% 18%/5% 8% 10% 8%;
+}
+
+.x-battery-chamber,
+.x-battery-glass{
+  position:absolute;
+  left:21%;
+  right:21%;
+  top:27%;
+  bottom:19%;
+  z-index:5;
+  overflow:hidden;
+  border-radius:28% 28% 19% 19%/9% 9% 7% 7%;
+  border:1px solid rgba(190,255,211,.28);
+  background:
+    linear-gradient(90deg,rgba(227,255,235,.045),rgba(45,205,105,.12) 24%,rgba(7,62,37,.2) 50%,rgba(45,205,105,.1) 76%,rgba(227,255,235,.035)),
+    rgba(4,45,27,.28);
+  backdrop-filter:blur(2px);
+  box-shadow:inset 0 0 34px rgba(87,255,146,.12),0 0 22px rgba(43,255,116,.08);
+}
+
+.x-battery-chamber:before,
+.x-battery-glass:before{
+  left:18%;
+  opacity:.38;
+}
+
+.x-battery-chamber:after,
+.x-battery-glass:after{
+  right:18%;
+  opacity:.28;
+}
+
+.x-battery-glass-reflection{
+  left:18%;
+  top:4%;
+  width:11%;
+  height:72%;
+  opacity:.42;
+  filter:blur(1px);
+}
+
+.x-battery-energy-column{
+  top:-8%;
+  bottom:-8%;
+  width:34%;
+  opacity:.9;
+  background:radial-gradient(ellipse at center,rgba(242,255,246,.92) 0 5%,rgba(171,255,199,.72) 12%,rgba(77,255,139,.42) 28%,rgba(31,218,96,.17) 48%,transparent 72%);
+  filter:blur(.3px) drop-shadow(0 0 13px rgba(96,255,150,.62)) drop-shadow(0 0 28px rgba(39,255,112,.26));
+  animation:x-battery-energy-breathe 4.8s ease-in-out infinite;
+}
+
+.x-battery-energy-column:before{
+  inset:10% 39%;
+  box-shadow:0 0 16px rgba(175,255,203,.75),0 0 32px rgba(66,255,131,.45);
+}
+
+.x-battery-energy-column i{
+  width:112%;
+  height:4.5%;
+  border-color:rgba(215,255,228,.42);
+  box-shadow:0 0 9px rgba(83,255,143,.34);
+  animation:x-battery-cohesion-ring 6s linear infinite;
+}
+.x-battery-energy-column i:nth-child(1){top:74%;animation-delay:0s}
+.x-battery-energy-column i:nth-child(2){top:74%;animation-delay:-2s}
+.x-battery-energy-column i:nth-child(3){top:74%;animation-delay:-4s}
+
+.x-battery-energy-particles i:nth-child(n+4){display:none}
+.x-battery-energy-particles i{
+  opacity:.55;
+  animation-duration:6s;
+}
+
+.x-battery-front-badge,
+.x-battery-emblem-housing{
+  position:absolute;
+  left:50%;
+  top:53%;
+  width:39%;
+  aspect-ratio:1;
+  transform:translate(-50%,-50%);
+  z-index:10;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:clamp(7px,1.3vw,10px) solid #082f20;
+  background:radial-gradient(circle at 48% 42%,#b8ffd0 0 8%,#56ec94 22%,#147745 52%,#05291c 76%);
+  box-shadow:0 0 0 2px rgba(107,255,158,.12),0 0 26px rgba(49,255,121,.18),inset 0 0 22px rgba(205,255,221,.12);
+}
+
+.x-battery-front-badge:before,
+.x-battery-emblem-housing:before,
+.x-battery-emblem-housing:after{
+  content:none;
+}
+
+.x-battery-front-badge .x-corps-symbol,
+.x-battery-emblem-housing .x-corps-symbol{
+  width:62%;
+  height:62%;
+  color:#062619;
+  filter:drop-shadow(0 1px 0 rgba(200,255,217,.16));
+}
+
+.x-battery-foot,
+.x-battery-base-reactor{
+  position:absolute;
+  left:10%;
+  right:10%;
+  bottom:1.5%;
+  height:18%;
+  z-index:9;
+  border:1px solid rgba(139,255,179,.14);
+  clip-path:polygon(8% 0,92% 0,100% 34%,94% 100%,6% 100%,0 34%);
+  background:linear-gradient(180deg,#146d43 0%,#0a422a 38%,#031e14 100%);
+  box-shadow:inset 0 1px 0 rgba(205,255,222,.05),0 14px 26px rgba(0,0,0,.36);
+}
+
+.x-battery-foot:before,
+.x-battery-base-reactor:before{
+  content:"";
+  position:absolute;
+  left:12%;
+  right:12%;
+  top:18%;
+  height:14%;
+  border-radius:50%;
+  background:linear-gradient(90deg,#062b1d,#168052,#062b1d);
+  opacity:.72;
+}
+
+.x-battery-foot span,
+.x-battery-base-reactor span{
+  position:absolute;
+  left:14%;
+  right:14%;
+  height:6px;
+  border-radius:50%;
+  background:linear-gradient(90deg,#042219,#126a43,#042219);
+  border:1px solid rgba(124,255,170,.1);
+}
+.x-battery-foot span:first-child{bottom:28%}
+.x-battery-foot span:last-child{bottom:14%;left:8%;right:8%}
+
+.x-battery-caption{
+  bottom:-1%;
+}
+
+@keyframes x-battery-cohesion-breathe{
+  0%,100%{opacity:.42;transform:translate(-50%,-50%) scale(.98)}
+  50%{opacity:.55;transform:translate(-50%,-50%) scale(1.02)}
+}
+
+@keyframes x-battery-energy-breathe{
+  0%,100%{opacity:.78;transform:translateX(-50%) scaleX(.96)}
+  50%{opacity:.94;transform:translateX(-50%) scaleX(1.02)}
+}
+
+@keyframes x-battery-cohesion-ring{
+  0%{opacity:0;transform:translateX(-50%) translateY(55px) rotateX(70deg) scale(.78)}
+  24%{opacity:.38}
+  75%{opacity:.18}
+  100%{opacity:0;transform:translateX(-50%) translateY(-130px) rotateX(70deg) scale(1.04)}
+}
+
+@media(max-width:680px){
+  .oa-scene.x-battery-scene{min-height:510px}
+  .x-central-battery{width:72%;height:74%;top:48%}
+  .x-central-battery.is-compact{width:68%;height:69%}
+  .x-battery-frame,.x-battery-reactor{width:78%;top:4%;bottom:8%}
+  .x-battery-arch,.x-battery-crown{left:15%;right:15%;height:29%;border-width:12px}
+  .x-battery-side-rail,.x-battery-brace{width:13%;top:25%;bottom:18%}
+  .x-battery-chamber,.x-battery-glass{left:22%;right:22%;top:27%;bottom:20%}
+  .x-battery-front-badge,.x-battery-emblem-housing{width:42%;top:53%}
+  .x-battery-foot,.x-battery-base-reactor{left:8%;right:8%;height:17%}
+  .x-battery-floor-rings{width:88%;height:12%;bottom:3%}
+  .x-battery-caption{bottom:-2%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .x-battery-aura,
+  .x-battery-energy-column,
+  .x-battery-energy-column i,
+  .x-battery-energy-particles i{animation:none!important}
+}
