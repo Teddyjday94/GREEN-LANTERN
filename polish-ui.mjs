@@ -4,36 +4,30 @@ export function batteryMarkup({compact=false}={}) {
   return `<div class="x-central-battery${compact?' is-compact':''}" role="img" aria-label="Central Power Battery on Oa">
     <div class="x-battery-aura" aria-hidden="true"></div>
     <div class="x-battery-light-column" aria-hidden="true"></div>
-    <div class="x-battery-floor-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="x-battery-floor-rings" aria-hidden="true"><i></i></div>
 
-    <div class="x-battery-crown" aria-hidden="true">
-      <span class="x-battery-crown-arch"></span>
-      <span class="x-battery-crown-cap"></span>
-      <i class="x-battery-crown-rib x-battery-crown-rib-left"></i>
-      <i class="x-battery-crown-rib x-battery-crown-rib-right"></i>
-    </div>
-
-    <div class="x-battery-reactor" aria-hidden="true">
-      <span class="x-battery-brace x-battery-brace-left"></span>
-      <span class="x-battery-brace x-battery-brace-right"></span>
-      <span class="x-battery-shoulder-ring x-battery-shoulder-ring-top"></span>
-      <span class="x-battery-shoulder-ring x-battery-shoulder-ring-bottom"></span>
-
-      <div class="x-battery-glass">
-        <span class="x-battery-glass-reflection"></span>
-        <div class="x-battery-energy-column">
-          <i></i><i></i><i></i><i></i><i></i>
-        </div>
-        <div class="x-battery-energy-particles"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="x-battery-frame x-battery-reactor" aria-hidden="true">
+      <div class="x-battery-arch x-battery-crown">
+        <span class="x-battery-arch-inner"></span>
       </div>
 
-      <div class="x-battery-emblem-housing">
-        <span class="x-battery-emblem-ring"></span>
+      <span class="x-battery-side-rail x-battery-side-rail-left x-battery-brace x-battery-brace-left"></span>
+      <span class="x-battery-side-rail x-battery-side-rail-right x-battery-brace x-battery-brace-right"></span>
+
+      <div class="x-battery-chamber x-battery-glass">
+        <span class="x-battery-glass-reflection"></span>
+        <div class="x-battery-energy-column">
+          <i></i><i></i><i></i>
+        </div>
+        <div class="x-battery-energy-particles"><i></i><i></i><i></i></div>
+      </div>
+
+      <div class="x-battery-front-badge x-battery-emblem-housing">
         ${symbolSVG('green')}
       </div>
 
-      <div class="x-battery-base-reactor">
-        <span></span><span></span><span></span><span></span>
+      <div class="x-battery-foot x-battery-base-reactor">
+        <span></span><span></span>
       </div>
     </div>
 
