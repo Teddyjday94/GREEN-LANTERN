@@ -11,11 +11,14 @@ test('corps symbol registry contains all nine primary spectrum identities', () =
   required.forEach(id => assert.match(symbolSVG(id), /<svg[\s\S]*data-corps=/));
 });
 
-test('central battery markup is built around a luminous green core and Corps emblem', () => {
+test('central battery markup is built around an architectural reactor and Corps emblem', () => {
   const html = batteryMarkup({ compact:false });
   assert.match(html, /x-central-battery/);
-  assert.match(html, /x-battery-core/);
-  assert.match(html, /x-battery-handle/);
+  assert.match(html, /x-battery-crown/);
+  assert.match(html, /x-battery-reactor/);
+  assert.match(html, /x-battery-glass/);
+  assert.match(html, /x-battery-energy-column/);
+  assert.match(html, /x-battery-emblem-housing/);
   assert.match(html, /data-corps="green"/);
   assert.match(html, /Central Power Battery/);
 });
