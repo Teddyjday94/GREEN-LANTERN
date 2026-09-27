@@ -3,7 +3,7 @@ import { lanternRecords } from '../expansion-data.mjs';
 const dist = new URL('../dist/', import.meta.url);
 await rm(dist,{recursive:true,force:true});
 await mkdir(dist,{recursive:true});
-for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs','router.mjs','expansion-sources.mjs','expansion-earth.mjs','expansion-cosmic.mjs','expansion-events.mjs','expansion-data.mjs','expansion-search.mjs','timeline.mjs','ring-scene.mjs','expansion-render.mjs','expansion.mjs','expansion.css','vercel.json']) {
+for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs','router.mjs','expansion-sources.mjs','expansion-earth.mjs','expansion-cosmic.mjs','expansion-events.mjs','expansion-data.mjs','expansion-search.mjs','timeline.mjs','ring-scene.mjs','expansion-render.mjs','expansion.mjs','expansion.css','corps-symbols.mjs','polish-ui.mjs','polish.mjs','polish.css','vercel.json']) {
   await copyFile(new URL(`../${file}`,import.meta.url),new URL(file,dist));
 }
 await mkdir(new URL('vendor/', dist), { recursive: true });
