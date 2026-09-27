@@ -1,0 +1,108 @@
+/* Final readability / responsive QA layer. Keep this last in the cascade. */
+html,body{max-width:100%;overflow-x:clip}
+#app,.page,.home-page,.section,.container,.x-expanded-view{min-width:0}
+.x-archive-layout>*,.x-dossier-layout>*,.x-timeline-body>*,.x-page-hero-grid>*,.section-head>*,.hero-grid>*{min-width:0}
+
+/* Prevent long names and display copy from colliding with neighboring UI. */
+.x-page-hero h1,.x-dossier-title h1,.x-dossier-section h2,.x-timeline-dossier h2,.x-card-body h3,.section-head h2,.hero-title,.oa-info h3{overflow-wrap:anywhere;word-break:normal;text-wrap:balance}
+.x-page-hero h1{line-height:.9;letter-spacing:-.045em;max-width:14ch}
+.x-dossier-title h1{line-height:.88;letter-spacing:-.05em;max-width:11ch}
+.x-card-body h3{line-height:1;letter-spacing:-.035em}
+.x-dossier-section h2,.x-timeline-dossier h2{line-height:1.04;letter-spacing:-.035em}
+.x-timeline-year-big{line-height:.92}
+
+/* Let metadata wrap naturally instead of fighting for one line. */
+.x-card-kicker,.x-card-meta,.x-dossier-badges,.hero-meta,.button-row,.x-archive-toolbar{flex-wrap:wrap;row-gap:8px}
+.x-card-kicker>*{min-width:0}
+.x-status,.x-card-meta span,.x-tags span,.x-rel-group a,.x-rel-group span,.button,.oa-node{overflow-wrap:anywhere;white-space:normal}
+.x-archive-toolbar{gap:12px;align-items:center}
+.x-archive-toolbar>*{min-width:0}
+
+/* Cards should grow from their content rather than forcing text into a fixed box. */
+.x-lantern-card{min-height:0}
+.x-card-body{display:flex;flex-direction:column;min-width:0}
+.x-card-link{margin-top:auto;padding-top:8px}
+.x-gallery-item{min-width:0}
+.x-source-list a{min-width:0;overflow-wrap:anywhere}
+
+/* Timeline readability: fewer competing sticky layers and safer content widths. */
+.x-year-rail{max-width:100%;overscroll-behavior-x:contain}
+.x-era-rail button,.x-event-node{overflow-wrap:anywhere}
+.x-event-node strong{line-height:1.3}
+.x-timeline-detail{min-width:0}
+.x-timeline-dossier p,.x-timeline-facts,.x-event-people{min-width:0}
+
+/* Strip decorative effects that add noise without information. */
+.x-card-scan,.x-scanline{display:none!important}
+.x-ui-organized .x-organized-section-alt:before{display:none}
+.x-ui-organized .x-polished-panel,.x-ui-organized .hard-panel{box-shadow:0 18px 48px rgba(0,0,0,.16),inset 0 1px 0 rgba(139,255,180,.03)}
+.holo-code{letter-spacing:.08em;opacity:.78}
+.x-ring-spec{letter-spacing:.08em;text-transform:none;max-width:220px;line-height:1.35}
+.x-ring-spec small{font-size:9px}
+
+/* The Corps rail should remain legible instead of truncating the emotion names. */
+.x-corps-chip small{white-space:normal;overflow:visible;text-overflow:clip;min-height:2.2em;text-align:center}
+.x-corps-chip b{line-height:1.25;overflow-wrap:anywhere}
+
+/* Keep Oa controls away from the battery core and allow labels to wrap. */
+.oa-scene.x-battery-scene .oa-node{max-width:min(180px,34%);line-height:1.25;text-align:center;letter-spacing:.08em}
+.x-battery-caption{width:min(230px,86%);white-space:normal}
+.x-battery-caption strong,.x-battery-caption small{overflow-wrap:anywhere}
+
+@media(max-width:1050px){
+  .x-page-hero h1{max-width:16ch}
+  .x-dossier-title h1{max-width:12ch}
+  .x-timeline-body{grid-template-columns:150px minmax(0,1fr)}
+}
+
+@media(max-width:760px){
+  .container{width:min(var(--max),calc(100% - 28px))}
+  .section{padding-block:clamp(64px,15vw,92px)}
+  .x-ui-organized .x-organized-section{padding-block:clamp(54px,13vw,78px)}
+  .x-page-hero{padding-top:108px;padding-bottom:38px}
+  .x-page-hero h1{font-size:clamp(44px,13vw,72px);line-height:.94;letter-spacing:-.035em;max-width:100%}
+  .x-dossier-hero{min-height:600px}
+  .x-dossier-title{padding-bottom:46px;max-width:100%}
+  .x-dossier-title h1{font-size:clamp(50px,16vw,92px);line-height:.92;letter-spacing:-.04em;max-width:100%;margin-bottom:16px}
+  .x-dossier-title .lede{font-size:1rem;line-height:1.6}
+  .x-dossier-section{padding:24px 20px}
+  .x-dossier-section h2{font-size:clamp(28px,9vw,44px)}
+  .x-card-body h3{font-size:clamp(27px,9vw,39px)}
+  .x-card-kicker{align-items:flex-start}
+  .x-archive-toolbar{position:relative;top:auto;background:transparent;padding-top:0}
+  .x-timeline-detail{position:relative;top:auto;padding:22px 18px;min-height:0}
+  .x-timeline-year-big{font-size:clamp(48px,15vw,72px)}
+  .x-timeline-dossier h2{font-size:clamp(28px,9vw,42px)}
+  .x-era-rail button{flex:0 0 min(190px,72vw)}
+  .x-event-node{flex-basis:min(250px,78vw);min-height:0}
+  .x-corps-chip{flex-basis:104px}
+  .oa-scene.x-battery-scene{min-height:560px}
+  .oa-scene.x-battery-scene .oa-node{max-width:42%;font-size:.56rem;padding:8px 9px}
+  .oa-scene.x-battery-scene .oa-node.n1{left:2%;top:13%}
+  .oa-scene.x-battery-scene .oa-node.n2{right:2%;top:13%}
+  .oa-scene.x-battery-scene .oa-node.n3{left:2%;bottom:7%}
+  .oa-scene.x-battery-scene .oa-node.n4{right:2%;bottom:7%}
+  .x-green-o-mark{display:none}
+  .x-ring-spec{right:12px;bottom:12px;max-width:160px;font-size:9px}
+}
+
+@media(max-width:520px){
+  .site-header{padding-inline:14px}
+  .brand{gap:10px}.brand small{display:none}
+  .hero{padding-top:100px}
+  .hero-title{font-size:clamp(3rem,15vw,4.6rem);line-height:.9;letter-spacing:-.035em}
+  .hero-meta{gap:10px;font-size:.58rem;letter-spacing:.1em}
+  .x-page-hero h1{font-size:clamp(40px,12.5vw,60px)}
+  .x-dossier-title h1{font-size:clamp(46px,15vw,76px)}
+  .x-rel-group a,.x-rel-group span,.x-tags span{max-width:100%}
+  .x-corps-spectrum-rail{margin-inline:-2px}
+  .x-corps-chip{flex-basis:96px;padding-inline:6px}
+  .x-central-battery{width:70%;height:68%}
+  .oa-scene.x-battery-scene{min-height:520px}
+  .oa-scene.x-battery-scene .oa-node{max-width:45%;font-size:.52rem;letter-spacing:.06em}
+  .x-battery-caption{bottom:-7%}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .x-ui-organized .x-event-node.is-active{transform:none}
+}
