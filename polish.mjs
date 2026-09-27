@@ -40,7 +40,7 @@ function addSpectrumRail(page) {
   if(!page || page.querySelector('.x-spectrum-symbols')) return;
   const section=document.createElement('section');
   section.className='section x-spectrum-symbols';
-  section.innerHTML=`<div class="container"><div class="x-polish-section-heading"><div><p class="eyebrow">Corps identifiers // emotional spectrum</p><h2>The light has <span class="display-outline">a symbol for every force.</span></h2></div><p>Use the Corps marks as an at-a-glance map of will, fear, rage, hope, avarice, compassion, love, death and life.</p></div>${spectrumRailMarkup()}</div>`;
+  section.innerHTML=`<div class="container"><div class="x-polish-section-heading"><div><p class="eyebrow">Emotional Spectrum</p><h2>Every light carries <span class="display-outline">its own mark.</span></h2></div><p>Use the Corps symbols to move through will, fear, rage, hope, avarice, compassion, love, death and life.</p></div>${spectrumRailMarkup()}</div>`;
   const hero=page.querySelector('.page-hero,.x-page-hero');
   if(hero) hero.after(section); else page.prepend(section);
   wireSpectrumRail(section);
