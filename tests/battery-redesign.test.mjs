@@ -6,25 +6,18 @@ import { batteryMarkup } from '../polish-ui.mjs';
 const root = new URL('../', import.meta.url);
 const read = (name) => readFile(new URL(name, root), 'utf8');
 
-test('Central Power Battery markup exposes architectural reactor layers', () => {
+test('Central Power Battery markup exposes only the uploaded model while it loads', () => {
   const html = batteryMarkup();
   assert.match(html, /x-battery-model/);
-  assert.match(html, /x-battery-fallback/);
-  for (const token of [
-    'x-battery-crown',
-    'x-battery-reactor',
-    'x-battery-glass',
-    'x-battery-energy-column',
-    'x-battery-emblem-housing',
-    'x-battery-base-reactor',
-    'x-battery-floor-rings'
-  ]) assert.match(html, new RegExp(token));
+  assert.doesNotMatch(html, /x-battery-fallback|x-battery-reactor|x-battery-emblem-housing/);
+  assert.match(html, /role="button"/);
+  assert.match(html, /tabindex="0"/);
 });
 
-test('Central Power Battery keeps the Green Lantern emblem on the front housing', () => {
+test('Central Power Battery announces its oath playback interaction', () => {
   const html = batteryMarkup();
-  assert.match(html, /x-battery-emblem-housing/);
-  assert.match(html, /x-corps-symbol/);
+  assert.match(html, /aria-label="Central Power Battery on Oa\. Activate to play the Green Lantern oath\."/);
+  assert.match(html, /<audio[^>]+class="x-battery-oath"[^>]+src="\/assets\/audio\/in-brightest-day-oath\.mp3"/);
   assert.match(html, /Central Power Battery/);
 });
 

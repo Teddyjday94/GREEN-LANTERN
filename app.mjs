@@ -1,6 +1,7 @@
 import { lanterns, villains, spectrum, events, reading, sources } from './data.mjs';
 import { searchLanterns } from './search.mjs';
 import { resolveRoute } from './router.mjs';
+import { ringHostMarkup } from './polish-ui.mjs';
 
 const app = document.querySelector('#app');
 const header = document.querySelector('#site-header');
@@ -49,11 +50,7 @@ function homePage() {
         <div class="button-row"><a class="button primary route-link" href="/lanterns">Enter the archive <span>↗</span></a><a class="button ghost route-link" href="/universe">Explore sectors</a></div>
         <div class="hero-meta"><span>Archive state: online</span><span>Primary sector: 2814</span><span>Sources: ${Object.keys(sources).length}</span><span>Records: ${lanterns.length}</span></div>
       </div>
-      <div class="hero-visual" id="hero-visual" aria-label="Procedural three-dimensional power ring visualization">
-        <div class="orbit-shell" aria-hidden="true"></div>
-        <div class="power-ring" id="power-ring" aria-hidden="true"><div class="ring-band"></div><div class="ring-face"><span class="lantern-glyph"></span></div></div>
-        <div class="ring-data"><b>POWER RING // 2814</b><span>Will-energy interface<br>Construct protocol ready<br>Charge stable: 100%</span></div>
-      </div>
+      ${ringHostMarkup()}
     </div></section>
 
     <section class="stat-strip"><div class="container stats">
@@ -248,25 +245,10 @@ function bindReveal() {
 }
 
 function bindPageInteractions(route) {
-  if (route.name === 'home') initHome();
   if (route.name === 'lanterns') initArchive();
   if (route.name === 'corps') { initOa(); initConstructLab(); }
   if (route.name === 'universe') initSectorMap();
   if (route.name === 'spectrum' || route.name === 'home') initSpectrumAmbient();
-}
-
-function initHome() {
-  const visual = document.querySelector('#hero-visual');
-  const ring = document.querySelector('#power-ring');
-  if (!visual || !ring || reduceMotion) return;
-  const move = (event) => {
-    const rect = visual.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - .5;
-    const y = (event.clientY - rect.top) / rect.height - .5;
-    ring.style.transform = `translate(-50%,-50%) rotateX(${64-y*18}deg) rotateY(${x*18}deg) rotateZ(${-14+x*8}deg)`;
-  };
-  visual.addEventListener('pointermove',move);
-  cleanupFns.push(() => visual.removeEventListener('pointermove',move));
 }
 
 function initArchive() {

@@ -38,11 +38,11 @@ test('ring visual targets preserve each model material baseline after release', 
 
   assert.deepEqual(
     ringScene.getRingVisualTargets({ held: false, pulseBoost: 0, holdProfile: profile, idleEmissive: 2.3 }),
-    { emissive: 2.3, light: 0 },
+    { emissive: 2.3, light: 0, faceOpacity: 0 },
   );
-  assert.ok(
-    ringScene.getRingVisualTargets({ held: true, pulseBoost: 0, holdProfile: profile, idleEmissive: 2.3 }).emissive > 2.3,
-  );
+  const held=ringScene.getRingVisualTargets({ held: true, pulseBoost: 0, holdProfile: profile, idleEmissive: 2.3 });
+  assert.ok(held.emissive > 2.3);
+  assert.ok(held.faceOpacity >= 0.75,'held ring should illuminate its face, not only the surrounding light');
 });
 
 test('uploaded ring textures are disposed and released as a group', () => {

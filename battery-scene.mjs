@@ -17,6 +17,43 @@ export function getBatteryFitProfile({compact=false}={}) {
   return {fov:30,cameraZ:7.4,modelHeight:compact?3.15:3.45};
 }
 
+export function createBatteryAudioController({audio}={}) {
+  let destroyed=false;
+  return {
+    async activate(){
+      if(destroyed || !audio) return false;
+      audio.currentTime=0;
+      try { await audio.play(); return true; }
+      catch { return false; }
+    },
+    destroy(){
+      if(destroyed) return;
+      destroyed=true;
+      audio?.pause?.();
+      if(audio) audio.currentTime=0;
+    },
+  };
+}
+
+export function bindBatteryAudio({target,audio}={}) {
+  const controller=createBatteryAudioController({audio});
+  const activate=()=>{ void controller.activate(); };
+  const keyActivate=(event)=>{
+    if(event.repeat || (event.key!=='Enter' && event.key!==' ')) return;
+    event.preventDefault();
+    activate();
+  };
+  target?.addEventListener?.('click',activate);
+  target?.addEventListener?.('keydown',keyActivate);
+  return {
+    destroy(){
+      target?.removeEventListener?.('click',activate);
+      target?.removeEventListener?.('keydown',keyActivate);
+      controller.destroy();
+    },
+  };
+}
+
 export function disposeBatteryResources({renderer,scene,materials}={}) {
   scene?.traverse((node)=>node.geometry?.dispose?.());
   materials?.forEach((material)=>material.dispose?.());
@@ -29,6 +66,7 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
   const host=container.querySelector('.x-battery-model');
   const shell=container.querySelector('.x-central-battery');
   if(!host || !shell) return null;
+  const audioBinding=bindBatteryAudio({target:shell,audio:shell.querySelector('.x-battery-oath')});
   let renderer=null,scene=null;
   const materials=new Map();
   try {
@@ -36,7 +74,7 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
       import('/vendor/three.module.js'),
       import('/vendor/loaders/OBJLoader.js'),
     ]);
-    if(signal?.aborted) return null;
+    if(signal?.aborted) { audioBinding.destroy(); return null; }
     const profile=getBatteryMotionProfile({reducedMotion,compact});
     scene=new THREE.Scene();
     const fit=getBatteryFitProfile({compact});
@@ -57,6 +95,7 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
         nodeMaterials.forEach((material)=>material?.dispose?.());
       });
       disposeBatteryResources({renderer,scene,materials});
+      audioBinding.destroy();
       return null;
     }
     const group=new THREE.Group(); group.add(object); scene.add(group);
@@ -118,6 +157,7 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
       destroyed=true;
       cancelAnimationFrame(raf);
       container.removeEventListener('pointermove',pointer);
+      audioBinding.destroy();
       globalThis.removeEventListener?.('resize',resize);
       disposeBatteryResources({renderer,scene,materials});
       shell.classList.remove('is-model-loaded');
@@ -125,8 +165,8 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
     return {destroy};
   } catch(error) {
     disposeBatteryResources({renderer,scene,materials});
-    console.warn('Uploaded Central Power Battery model unavailable; retaining illustrated fallback.',error);
-    shell.classList.add('is-model-fallback');
-    return null;
+    console.warn('Uploaded Central Power Battery model unavailable; retaining the ambient Oa scene.',error);
+    shell.classList.add('is-model-unavailable');
+    return {destroy(){ audioBinding.destroy(); shell.classList.remove('is-model-unavailable'); }};
   }
 }

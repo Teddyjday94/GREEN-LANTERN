@@ -24,9 +24,9 @@ export function getRingRotationTarget({normalizedX=0,normalizedY=0,mobile=false,
   const x=reducedMotion?0:Math.max(-1,Math.min(1,normalizedX));
   const y=reducedMotion?0:Math.max(-1,Math.min(1,normalizedY));
   return {
-    x:0.68+y*(mobile?0.58:0.72),
-    y:0.12+x*(mobile?0.92:1.15),
-    z:-0.06+x*0.12,
+    x:0.86+y*(mobile?0.58:0.72),
+    y:0.06+x*(mobile?0.92:1.15),
+    z:-0.03+x*0.12,
   };
 }
 
@@ -51,6 +51,7 @@ export function getRingVisualTargets({held=false,pulseBoost=0,holdProfile,idleEm
   return {
     emissive:(held ? heldEmissive : idleEmissive)+pulseBoost,
     light:held ? (holdProfile?.heldLight ?? 0) : Math.min(holdProfile?.heldLight ?? 0,pulseBoost*10),
+    faceOpacity:held ? (holdProfile?.animateEffects===false ? 0.78 : 0.92) : 0,
   };
 }
 
@@ -129,6 +130,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     scene.add(new THREE.AmbientLight(0x0f3824,1.2));
 
     let hitTargets=[band,inner,shoulder,face,core,rim,bar1,bar2];
+    let faceGlow=null;
     const emissiveMaterials=[{material:glow,idleEmissive:glow.emissiveIntensity}];
     const loadedTextures=[];
     try {
@@ -182,7 +184,14 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
       uploaded.scale.setScalar(scale);
       const fittedBox=new THREE.Box3().setFromObject(uploaded);
       uploaded.position.sub(fittedBox.getCenter(new THREE.Vector3()));
+      const centeredBox=new THREE.Box3().setFromObject(uploaded);
+      const centeredSize=centeredBox.getSize(new THREE.Vector3());
+      const faceGlowMaterial=new THREE.MeshBasicMaterial({color:0x5dff98,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});
+      faceGlow=new THREE.Mesh(new THREE.CircleGeometry(Math.min(centeredSize.x,centeredSize.z)*0.22,64),faceGlowMaterial);
+      faceGlow.rotation.x=-Math.PI/2;
+      faceGlow.position.set(0,centeredBox.max.y+0.015,0);
       group.add(uploaded);
+      group.add(faceGlow);
       fallback.visible=false;
       hitTargets=uploadedMeshes;
       emissiveMaterials.push({material:uploadedMaterial,idleEmissive:holdProfile.idleEmissive});
@@ -244,8 +253,9 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
         const {emissive}=getRingVisualTargets({held,pulseBoost,holdProfile,idleEmissive});
         material.emissiveIntensity+=(emissive-material.emissiveIntensity)*0.18;
       });
-      const {light:targetLight}=getRingVisualTargets({held,pulseBoost,holdProfile});
+      const {light:targetLight,faceOpacity}=getRingVisualTargets({held,pulseBoost,holdProfile});
       faceLight.intensity+=(targetLight-faceLight.intensity)*0.2;
+      if(faceGlow) faceGlow.material.opacity+=(faceOpacity-faceGlow.material.opacity)*(reducedMotion?0.5:0.22);
       const pulseAge=pulseStart ? Math.min(1,(performance.now()-pulseStart)/clickProfile.rippleDuration) : 1;
       pulseDisc.scale.setScalar(1+pulseAge*1.2); pulseDiscMaterial.opacity=pulseStart ? Math.sin(pulseAge*Math.PI)*0.8 : 0;
       if(particles){ particles.rotation.z=t*0.00008; particles.material.opacity=0.36+Math.min(0.6,pulseBoost*0.07); particles.material.size=0.035+(clickProfile.particleBurst?Math.min(0.055,pulseBoost*0.004):0); }

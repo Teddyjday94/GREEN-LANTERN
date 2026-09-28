@@ -53,3 +53,38 @@ test('battery resource cleanup releases WebGL, geometry and material allocations
 
   assert.deepEqual({geometryDisposed,materialDisposed,rendererDisposed,canvasRemoved},{geometryDisposed:1,materialDisposed:1,rendererDisposed:1,canvasRemoved:1});
 });
+
+test('battery oath activation restarts and plays the supplied clip',async()=>{
+  assert.equal(typeof batteryScene.createBatteryAudioController,'function');
+  const calls=[];
+  const audio={currentTime:9,play(){calls.push(['play',this.currentTime]);return Promise.resolve();},pause(){calls.push(['pause']);}};
+  const controller=batteryScene.createBatteryAudioController({audio});
+
+  await controller.activate();
+  assert.deepEqual(calls,[['play',0]]);
+  controller.destroy();
+  assert.deepEqual(calls,[['play',0],['pause']]);
+  assert.equal(audio.currentTime,0);
+});
+
+test('battery oath binding works without WebGL and ignores keyboard auto-repeat',async()=>{
+  assert.equal(typeof batteryScene.bindBatteryAudio,'function');
+  const target=new EventTarget();
+  const calls=[];
+  const audio={currentTime:4,play(){calls.push(['play',this.currentTime]);return Promise.resolve();},pause(){calls.push(['pause']);}};
+  const binding=batteryScene.bindBatteryAudio({target,audio});
+  const key=(repeat=false)=>Object.assign(new Event('keydown',{cancelable:true}),{key:'Enter',repeat});
+
+  target.dispatchEvent(key(false));
+  target.dispatchEvent(key(true));
+  await Promise.resolve();
+  assert.deepEqual(calls,[['play',0]]);
+  binding.destroy();
+  target.dispatchEvent(new Event('click'));
+  assert.deepEqual(calls,[['play',0],['pause']]);
+});
+
+test('supplied oath audio is included as a non-empty site asset',async()=>{
+  const audio=await readFile(new URL('../assets/audio/in-brightest-day-oath.mp3',import.meta.url)).catch(()=>Buffer.alloc(0));
+  assert.ok(audio.length>100_000);
+});

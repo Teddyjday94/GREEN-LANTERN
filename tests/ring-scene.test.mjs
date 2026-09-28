@@ -9,7 +9,7 @@ test('pointer travel exposes the ring face with substantially wider pitch and ya
   const center=ringScene.getRingRotationTarget({normalizedX:0,normalizedY:0});
   const right=ringScene.getRingRotationTarget({normalizedX:1,normalizedY:0});
   const down=ringScene.getRingRotationTarget({normalizedX:0,normalizedY:1});
-  assert.ok(Math.abs(center.x)>=0.4,'resting pitch should present the ring face');
+  assert.ok(center.x>=0.78 && center.x<=1.05,'resting pitch should turn the uploaded ring face toward the viewer');
   assert.ok(Math.abs(right.y-center.y)>=0.8,'horizontal travel should produce clear yaw');
   assert.ok(Math.abs(down.x-center.x)>=0.5,'vertical travel should produce clear pitch');
 });

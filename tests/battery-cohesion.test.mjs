@@ -6,28 +6,16 @@ import { batteryMarkup } from '../polish-ui.mjs';
 const root = new URL('../', import.meta.url);
 const read = (name) => readFile(new URL(name, root), 'utf8');
 
-test('battery markup reads as one connected lantern body', () => {
+test('battery markup never emits the retired illustrated lantern body', () => {
   const html = batteryMarkup();
-  for (const token of [
-    'x-battery-frame',
-    'x-battery-arch',
-    'x-battery-side-rail',
-    'x-battery-chamber',
-    'x-battery-foot',
-    'x-battery-front-badge'
-  ]) assert.match(html, new RegExp(token));
+  assert.match(html, /x-battery-model/);
+  assert.doesNotMatch(html, /x-battery-frame|x-battery-fallback|x-battery-front-badge/);
 });
 
-test('battery cohesion layer favors a single silhouette and restrained floor light', async () => {
+test('battery cohesion layer keeps the uploaded model hidden until ready and keyboard focus visible', async () => {
   const css = await read('battery-cohesion.css');
-  for (const token of [
-    '.x-battery-frame',
-    '.x-battery-arch',
-    '.x-battery-side-rail',
-    '.x-battery-chamber',
-    '.x-battery-foot',
-    '.x-battery-front-badge'
-  ]) assert.match(css, new RegExp(token.replace('.', '\\.')));
-  assert.match(css, /\.x-battery-floor-rings[^}]*opacity:\s*\.2/);
+  assert.match(css, /\.x-battery-model[^}]*opacity:\s*0/);
+  assert.match(css, /\.x-central-battery\.is-model-loaded \.x-battery-model\{opacity:1\}/);
+  assert.match(css, /\.x-central-battery:focus-visible/);
   assert.match(css, /@media\(max-width:680px\)/);
 });

@@ -11,6 +11,13 @@
   height:min(565px,84%);
   top:49%;
   filter:drop-shadow(0 34px 42px rgba(0,0,0,.5));
+  pointer-events:auto;
+  cursor:pointer;
+}
+
+.x-central-battery:focus-visible{
+  outline:2px solid #78ffad;
+  outline-offset:8px;
 }
 
 .x-central-battery.is-compact{
@@ -18,8 +25,7 @@
   height:min(470px,78%);
 }
 
-.x-battery-model,
-.x-battery-fallback{
+.x-battery-model{
   position:absolute;
   inset:0;
 }
@@ -37,15 +43,8 @@
   height:100%;
 }
 
-.x-battery-fallback{
-  z-index:4;
-  opacity:1;
-  transition:opacity .35s ease;
-}
-
 .x-central-battery.is-model-loaded .x-battery-model{opacity:1}
-.x-central-battery.is-model-loaded .x-battery-fallback{opacity:0}
-.x-central-battery.is-model-fallback .x-battery-model{display:none}
+.x-central-battery.is-model-unavailable .x-battery-model{opacity:0}
 
 .x-battery-aura{
   width:118%;
@@ -354,8 +353,7 @@
 }
 
 @media(prefers-reduced-motion:reduce){
-  .x-battery-model,
-  .x-battery-fallback{transition:none}
+  .x-battery-model{transition:none}
   .x-battery-aura,
   .x-battery-energy-column,
   .x-battery-energy-column i,
