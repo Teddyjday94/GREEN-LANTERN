@@ -1,9 +1,10 @@
 import { batteryMarkup, spectrumRailMarkup } from './polish-ui.mjs';
 import { corpsSymbols } from './corps-symbols.mjs';
+import { mountPowerBattery } from './battery-scene.mjs';
 
 const app=document.querySelector('#app');
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-let scheduled=0;
+let scheduled=0,batteryController=null,batteryAbort=null,batteryScene=null;
 
 document.body.classList.add('x-ui-organized');
 
@@ -15,6 +16,19 @@ function enhanceBatteryScene(scene, {compact=false}={}) {
   controls.forEach((control)=>scene.append(control));
   scene.dataset.xBattery='1';
   scene.classList.add('x-battery-scene');
+  batteryAbort?.abort(); batteryController?.destroy?.();
+  batteryScene=scene; batteryAbort=new AbortController();
+  mountPowerBattery({container:scene,reducedMotion,compact,signal:batteryAbort.signal}).then((controller)=>{
+    if(!batteryAbort?.signal.aborted && batteryScene===scene) batteryController=controller;
+    else controller?.destroy?.();
+  });
+}
+
+function cleanupBatteryScene(activeScenes) {
+  if(batteryScene && !activeScenes.includes(batteryScene)) {
+    batteryAbort?.abort(); batteryController?.destroy?.();
+    batteryAbort=null; batteryController=null; batteryScene=null;
+  }
 }
 
 function wireSpectrumRail(root=document) {
@@ -67,7 +81,9 @@ function organizeSections(root) {
 function enhanceRoute() {
   if(!app) return;
   const path=location.pathname.replace(/\/$/,'')||'/';
-  app.querySelectorAll('.oa-scene').forEach((scene)=>enhanceBatteryScene(scene,{compact:path==='/'}));
+  const batteryScenes=[...app.querySelectorAll('.oa-scene')];
+  cleanupBatteryScene(batteryScenes);
+  batteryScenes.forEach((scene)=>enhanceBatteryScene(scene,{compact:path==='/'}));
   if(path==='/spectrum' || path==='/corps') addSpectrumRail(app.querySelector('.page')||app);
   if(path==='/' || path==='/corps') addGreenMark(app);
   organizeSections(app);

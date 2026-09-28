@@ -3,7 +3,7 @@ import { lanternRecords } from '../expansion-data.mjs';
 const dist = new URL('../dist/', import.meta.url);
 await rm(dist,{recursive:true,force:true});
 await mkdir(dist,{recursive:true});
-for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs','router.mjs','expansion-sources.mjs','expansion-earth.mjs','expansion-cosmic.mjs','expansion-events.mjs','expansion-data.mjs','expansion-search.mjs','timeline.mjs','ring-scene.mjs','expansion-render.mjs','expansion.mjs','expansion.css','corps-symbols.mjs','polish-ui.mjs','polish.mjs','polish.css','no-slop.css','battery-redesign.css','battery-cohesion.css','copy-cleanup.mjs','vercel.json']) {
+for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs','router.mjs','expansion-sources.mjs','expansion-earth.mjs','expansion-cosmic.mjs','expansion-events.mjs','expansion-data.mjs','expansion-search.mjs','timeline.mjs','ring-scene.mjs','battery-scene.mjs','expansion-render.mjs','expansion.mjs','expansion.css','corps-symbols.mjs','polish-ui.mjs','polish.mjs','polish.css','no-slop.css','battery-redesign.css','battery-cohesion.css','copy-cleanup.mjs','vercel.json']) {
   await copyFile(new URL(`../${file}`,import.meta.url),new URL(file,dist));
 }
 await mkdir(new URL('vendor/', dist), { recursive: true });
@@ -12,6 +12,7 @@ await copyFile(new URL('../node_modules/three/build/three.core.js', import.meta.
 await mkdir(new URL('vendor/loaders/collada/', dist), { recursive: true });
 await copyFile(new URL('../node_modules/three/examples/jsm/loaders/ColladaLoader.js', import.meta.url), new URL('vendor/loaders/ColladaLoader.js', dist));
 await copyFile(new URL('../node_modules/three/examples/jsm/loaders/TGALoader.js', import.meta.url), new URL('vendor/loaders/TGALoader.js', dist));
+await copyFile(new URL('../node_modules/three/examples/jsm/loaders/OBJLoader.js', import.meta.url), new URL('vendor/loaders/OBJLoader.js', dist));
 await copyFile(new URL('../node_modules/three/examples/jsm/loaders/collada/ColladaParser.js', import.meta.url), new URL('vendor/loaders/collada/ColladaParser.js', dist));
 await copyFile(new URL('../node_modules/three/examples/jsm/loaders/collada/ColladaComposer.js', import.meta.url), new URL('vendor/loaders/collada/ColladaComposer.js', dist));
 await cp(new URL('../assets/', import.meta.url), new URL('assets/', dist), { recursive: true });

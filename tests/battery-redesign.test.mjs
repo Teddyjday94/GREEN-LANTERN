@@ -8,6 +8,8 @@ const read = (name) => readFile(new URL(name, root), 'utf8');
 
 test('Central Power Battery markup exposes architectural reactor layers', () => {
   const html = batteryMarkup();
+  assert.match(html, /x-battery-model/);
+  assert.match(html, /x-battery-fallback/);
   for (const token of [
     'x-battery-crown',
     'x-battery-reactor',

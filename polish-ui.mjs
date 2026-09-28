@@ -2,6 +2,8 @@ import { corpsSymbols, symbolSVG } from './corps-symbols.mjs';
 
 export function batteryMarkup({compact=false}={}) {
   return `<div class="x-central-battery${compact?' is-compact':''}" role="img" aria-label="Central Power Battery on Oa">
+    <div class="x-battery-model" aria-hidden="true"></div>
+    <div class="x-battery-fallback" aria-hidden="true">
     <div class="x-battery-aura" aria-hidden="true"></div>
     <div class="x-battery-light-column" aria-hidden="true"></div>
     <div class="x-battery-floor-rings" aria-hidden="true"><i></i></div>
@@ -29,6 +31,7 @@ export function batteryMarkup({compact=false}={}) {
       <div class="x-battery-foot x-battery-base-reactor">
         <span></span><span></span>
       </div>
+    </div>
     </div>
 
     <div class="x-battery-caption"><strong>Central Power Battery</strong><small>Sector 0 · Oa · reservoir of willpower</small></div>

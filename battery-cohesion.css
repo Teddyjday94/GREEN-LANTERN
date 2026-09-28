@@ -18,6 +18,35 @@
   height:min(470px,78%);
 }
 
+.x-battery-model,
+.x-battery-fallback{
+  position:absolute;
+  inset:0;
+}
+
+.x-battery-model{
+  z-index:8;
+  opacity:0;
+  transition:opacity .5s ease;
+  filter:drop-shadow(0 28px 34px rgba(0,0,0,.48)) drop-shadow(0 0 18px rgba(48,255,119,.14));
+}
+
+.x-battery-model canvas{
+  display:block;
+  width:100%;
+  height:100%;
+}
+
+.x-battery-fallback{
+  z-index:4;
+  opacity:1;
+  transition:opacity .35s ease;
+}
+
+.x-central-battery.is-model-loaded .x-battery-model{opacity:1}
+.x-central-battery.is-model-loaded .x-battery-fallback{opacity:0}
+.x-central-battery.is-model-fallback .x-battery-model{display:none}
+
 .x-battery-aura{
   width:118%;
   top:52%;
@@ -325,6 +354,8 @@
 }
 
 @media(prefers-reduced-motion:reduce){
+  .x-battery-model,
+  .x-battery-fallback{transition:none}
   .x-battery-aura,
   .x-battery-energy-column,
   .x-battery-energy-column i,

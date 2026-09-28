@@ -20,6 +20,16 @@ export function getRingHoldProfile({reducedMotion=false}={}) {
     : { idleEmissive:0.15, heldEmissive:4.2, heldLight:62, animateEffects:true };
 }
 
+export function getRingRotationTarget({normalizedX=0,normalizedY=0,mobile=false}={}) {
+  const x=Math.max(-1,Math.min(1,normalizedX));
+  const y=Math.max(-1,Math.min(1,normalizedY));
+  return {
+    x:0.68+y*(mobile?0.58:0.72),
+    y:0.12+x*(mobile?0.92:1.15),
+    z:-0.06+x*0.12,
+  };
+}
+
 export function createRingHoldController({onChange=()=>{}}={}) {
   let held=false;
   const setHeld=(next)=>{
@@ -86,7 +96,9 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     container.append(renderer.domElement);
 
     const group=new THREE.Group(); scene.add(group);
-    group.rotation.x=-0.12; group.rotation.y=0.58; group.rotation.z=-0.08;
+    const mobile=(container.clientWidth||innerWidth)<720;
+    let rotationTarget=getRingRotationTarget({mobile});
+    group.rotation.set(rotationTarget.x,rotationTarget.y,rotationTarget.z);
     const fallback=new THREE.Group(); group.add(fallback);
 
     const metal=new THREE.MeshStandardMaterial({color:0x0c7d43,metalness:0.88,roughness:0.28});
@@ -191,8 +203,8 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
 
     const raycaster=new THREE.Raycaster();
     const pointerNdc=new THREE.Vector2();
-    let targetX=0,targetY=0,scrollY=0,pulseBoost=0,pulseStart=0,raf=0,first=true;
-    const pointer=(e)=>{ const rect=container.getBoundingClientRect(); targetY=((e.clientX-rect.left)/rect.width-.5)*0.32; targetX=((e.clientY-rect.top)/rect.height-.5)*0.2; };
+    let scrollY=0,pulseBoost=0,pulseStart=0,raf=0,first=true;
+    const pointer=(e)=>{ const rect=container.getBoundingClientRect(); rotationTarget=getRingRotationTarget({normalizedX:((e.clientX-rect.left)/rect.width-.5)*2,normalizedY:((e.clientY-rect.top)/rect.height-.5)*2,mobile}); };
     const activateFace=()=>{ pulseBoost=Math.max(pulseBoost,clickProfile.emissiveBoost); pulseStart=performance.now(); container.classList.remove('ring-face-activated'); void container.offsetWidth; container.classList.add('ring-face-activated'); setTimeout(()=>container.classList.remove('ring-face-activated'),clickProfile.rippleDuration); };
     const hold=createRingHoldController({onChange:(held)=>{
       container.classList.toggle('ring-held',held);
@@ -221,9 +233,10 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
 
     const tick=(t)=>{
       if(signal?.aborted) return destroy();
-      group.rotation.y += profile.idleRotation;
-      group.rotation.x += (targetX-group.rotation.x)*0.035;
-      group.rotation.z += ((-0.08+targetY)-group.rotation.z)*0.035;
+      const idleYaw=profile.idleRotation?Math.sin(t*0.00022)*0.1:0;
+      group.rotation.x += (rotationTarget.x-group.rotation.x)*0.065;
+      group.rotation.y += (rotationTarget.y+idleYaw-group.rotation.y)*0.065;
+      group.rotation.z += (rotationTarget.z-group.rotation.z)*0.065;
       camera.position.z=7.1-(profile.scrollMotion?scrollY*0.65:0);
       pulseBoost*=reducedMotion?0.84:0.91;
       const held=hold.held;
