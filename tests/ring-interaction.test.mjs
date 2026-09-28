@@ -57,6 +57,21 @@ test('uploaded ring textures are disposed and released as a group', () => {
   assert.equal(textures.length, 0);
 });
 
+test('texture load failures wait for slower requests before cleanup begins', async () => {
+  assert.equal(typeof ringScene.settleRingTextureLoads, 'function');
+  let slowerRequestFinished = false;
+  const slowerRequest = new Promise((resolve) => setTimeout(() => {
+    slowerRequestFinished = true;
+    resolve('loaded texture');
+  }, 5));
+
+  await assert.rejects(
+    ringScene.settleRingTextureLoads([Promise.reject(new Error('texture failed')), slowerRequest]),
+    /texture failed/,
+  );
+  assert.equal(slowerRequestFinished, true);
+});
+
 test('ring face click produces a strong emissive pulse in full motion mode', () => {
   const profile = getRingClickProfile({ reducedMotion:false });
   assert.ok(profile.emissiveBoost >= 7);

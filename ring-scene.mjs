@@ -49,6 +49,13 @@ export function disposeRingTextures(textures=[]) {
   textures.length=0;
 }
 
+export async function settleRingTextureLoads(textureLoads=[]) {
+  const results=await Promise.allSettled(textureLoads);
+  const failure=results.find((result)=>result.status==='rejected');
+  if(failure) throw failure.reason;
+  return results.map((result)=>result.value);
+}
+
 export function supportsWebGL() {
   try {
     if (typeof document === 'undefined') return false;
@@ -115,7 +122,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     try {
       const [{ColladaLoader},maps]=await Promise.all([
         import('/vendor/loaders/ColladaLoader.js'),
-        Promise.all([
+        settleRingTextureLoads([
           ['/assets/ring/textures/albedo.jpg',true],
           ['/assets/ring/textures/roughness.jpg',false],
           ['/assets/ring/textures/metallic.jpg',false],
