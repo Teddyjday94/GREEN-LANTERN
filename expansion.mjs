@@ -15,7 +15,6 @@ hero.dataset.xRing='1'; hero.classList.add('x-ring-stage');
 const label=document.createElement('div'); label.className='x-ring-spec'; label.innerHTML='<span>POWER RING</span><small>Press and hold to charge</small>'; hero.append(label);
 ringAbort?.abort(); ringController?.destroy?.(); ringAbort=new AbortController();
 ringController=await mountPowerRing({container:hero,reducedMotion,signal:ringAbort.signal});
-if(ringController && !reducedMotion) setTimeout(()=>ringController?.pulse(),1500);
 }
 home.querySelectorAll('.lantern-card').forEach((el)=>{if(/Kyle Rayner/i.test(el.textContent||'') && !el.querySelector('img')){const art=getPrimaryArtwork(getLantern('kyle-rayner'));const target=el.querySelector('.card-fallback')||el; const img=document.createElement('img');img.dataset.xArt='1';img.src=art.url;img.alt=art.alt;img.loading='lazy';img.referrerPolicy='no-referrer';target.append(img);wireImageFallbacks(el);}});
 if(!home.querySelector('.x-home-cosmic')){

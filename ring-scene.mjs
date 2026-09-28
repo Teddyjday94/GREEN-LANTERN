@@ -36,6 +36,19 @@ export function createRingHoldController({onChange=()=>{}}={}) {
   };
 }
 
+export function getRingVisualTargets({held=false,pulseBoost=0,holdProfile,idleEmissive=0}={}) {
+  const heldEmissive=Math.max(holdProfile?.heldEmissive ?? idleEmissive,idleEmissive+1.9);
+  return {
+    emissive:(held ? heldEmissive : idleEmissive)+pulseBoost,
+    light:held ? (holdProfile?.heldLight ?? 0) : Math.min(holdProfile?.heldLight ?? 0,pulseBoost*10),
+  };
+}
+
+export function disposeRingTextures(textures=[]) {
+  textures.forEach((texture)=>texture.dispose());
+  textures.length=0;
+}
+
 export function supportsWebGL() {
   try {
     if (typeof document === 'undefined') return false;
@@ -97,7 +110,8 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     scene.add(new THREE.AmbientLight(0x0f3824,1.2));
 
     let hitTargets=[band,inner,shoulder,face,core,rim,bar1,bar2];
-    const emissiveMaterials=[glow];
+    const emissiveMaterials=[{material:glow,idleEmissive:glow.emissiveIntensity}];
+    const loadedTextures=[];
     try {
       const [{ColladaLoader},maps]=await Promise.all([
         import('/vendor/loaders/ColladaLoader.js'),
@@ -111,18 +125,19 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
         ].map(([url,color])=>new Promise((resolve,reject)=>new THREE.TextureLoader().load(url,(texture)=>{
           texture.flipY=false;
           if(color) texture.colorSpace=THREE.SRGBColorSpace;
+          loadedTextures.push(texture);
           resolve(texture);
         },undefined,reject))))
       ]);
       if(signal?.aborted) {
-        maps.forEach((texture)=>texture.dispose());
+        disposeRingTextures(loadedTextures);
         renderer.dispose();
         renderer.domElement.remove();
         return null;
       }
       const collada=await new ColladaLoader().loadAsync('/assets/ring/model.dae');
       if(signal?.aborted) {
-        maps.forEach((texture)=>texture.dispose());
+        disposeRingTextures(loadedTextures);
         renderer.dispose();
         renderer.domElement.remove();
         return null;
@@ -151,9 +166,10 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
       group.add(uploaded);
       fallback.visible=false;
       hitTargets=uploadedMeshes;
-      emissiveMaterials.push(uploadedMaterial);
+      emissiveMaterials.push({material:uploadedMaterial,idleEmissive:holdProfile.idleEmissive});
       container.classList.add('ring-model-loaded');
     } catch(error) {
+      disposeRingTextures(loadedTextures);
       console.warn('Uploaded ring model unavailable; retaining procedural fallback.',error);
       container.classList.add('ring-model-fallback');
     }
@@ -174,15 +190,15 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     const hold=createRingHoldController({onChange:(held)=>{
       container.classList.toggle('ring-held',held);
       renderer.domElement.setAttribute('aria-pressed',String(held));
-      if(held && holdProfile.animateEffects) activateFace();
     }});
     renderer.domElement.setAttribute('aria-pressed','false');
     const hitRing=(e)=>{ const rect=renderer.domElement.getBoundingClientRect(); pointerNdc.x=((e.clientX-rect.left)/rect.width)*2-1; pointerNdc.y=-((e.clientY-rect.top)/rect.height)*2+1; raycaster.setFromCamera(pointerNdc,camera); return raycaster.intersectObjects(hitTargets,false).length>0; };
-    const press=(e)=>{ if(!hitRing(e)) return; renderer.domElement.setPointerCapture?.(e.pointerId); hold.begin(); };
-    const release=(e)=>{ hold.end(); if(e?.pointerId!==undefined && renderer.domElement.hasPointerCapture?.(e.pointerId)) renderer.domElement.releasePointerCapture(e.pointerId); };
-    const leave=()=>hold.end();
-    const keyDown=(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); hold.begin(); } };
-    const keyUp=(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); hold.end(); } };
+    let activePointerId=null,keyboardHeld=false;
+    const press=(e)=>{ if(activePointerId!==null || keyboardHeld || !hitRing(e)) return; activePointerId=e.pointerId; renderer.domElement.setPointerCapture?.(e.pointerId); hold.begin(); };
+    const release=(e)=>{ if(e?.pointerId!==activePointerId) return; const pointerId=activePointerId; activePointerId=null; hold.end(); if(renderer.domElement.hasPointerCapture?.(pointerId)) renderer.domElement.releasePointerCapture(pointerId); };
+    const leave=(e)=>{ if(activePointerId!==null && e?.pointerId!==undefined && e.pointerId!==activePointerId) return; activePointerId=null; keyboardHeld=false; hold.end(); };
+    const keyDown=(e)=>{ if((e.key==='Enter'||e.key===' ') && activePointerId===null){ e.preventDefault(); keyboardHeld=true; hold.begin(); } };
+    const keyUp=(e)=>{ if((e.key==='Enter'||e.key===' ') && keyboardHeld){ e.preventDefault(); keyboardHeld=false; hold.end(); } };
     const scroll=()=>{ if(profile.scrollMotion) scrollY=Math.min(1,Math.max(0,globalThis.scrollY/(globalThis.innerHeight||800))); };
     const resize=()=>{ const w=Math.max(1,container.clientWidth),h=Math.max(1,container.clientHeight); camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h,false); };
     container.addEventListener('pointermove',pointer,{passive:true});
@@ -204,9 +220,11 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
       camera.position.z=7.1-(profile.scrollMotion?scrollY*0.65:0);
       pulseBoost*=reducedMotion?0.84:0.91;
       const held=hold.held;
-      const targetEmissive=held?holdProfile.heldEmissive:holdProfile.idleEmissive;
-      emissiveMaterials.forEach((material)=>{ material.emissiveIntensity+=(targetEmissive+pulseBoost-material.emissiveIntensity)*0.18; });
-      const targetLight=held?holdProfile.heldLight:Math.min(holdProfile.heldLight,pulseBoost*10);
+      emissiveMaterials.forEach(({material,idleEmissive})=>{
+        const {emissive}=getRingVisualTargets({held,pulseBoost,holdProfile,idleEmissive});
+        material.emissiveIntensity+=(emissive-material.emissiveIntensity)*0.18;
+      });
+      const {light:targetLight}=getRingVisualTargets({held,pulseBoost,holdProfile});
       faceLight.intensity+=(targetLight-faceLight.intensity)*0.2;
       const pulseAge=pulseStart ? Math.min(1,(performance.now()-pulseStart)/clickProfile.rippleDuration) : 1;
       pulseDisc.scale.setScalar(1+pulseAge*1.2); pulseDiscMaterial.opacity=pulseStart ? Math.sin(pulseAge*Math.PI)*0.8 : 0;
@@ -220,7 +238,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     function destroy(){
       cancelAnimationFrame(raf); hold.end(); container.removeEventListener('pointermove',pointer);
       renderer.domElement.removeEventListener('pointerdown',press); renderer.domElement.removeEventListener('pointerup',release); renderer.domElement.removeEventListener('pointercancel',release); renderer.domElement.removeEventListener('lostpointercapture',leave); renderer.domElement.removeEventListener('pointerleave',leave); renderer.domElement.removeEventListener('keydown',keyDown); renderer.domElement.removeEventListener('keyup',keyUp); renderer.domElement.removeEventListener('blur',leave);
-      globalThis.removeEventListener?.('scroll',scroll); globalThis.removeEventListener?.('resize',resize); renderer.dispose(); renderer.domElement.remove(); scene.traverse((o)=>{o.geometry?.dispose?.(); if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach((m)=>m.dispose?.());}}); container.classList.remove('ring-live','ring-held','ring-face-activated','ring-model-loaded','ring-model-fallback');
+      globalThis.removeEventListener?.('scroll',scroll); globalThis.removeEventListener?.('resize',resize); disposeRingTextures(loadedTextures); renderer.dispose(); renderer.domElement.remove(); scene.traverse((o)=>{o.geometry?.dispose?.(); if(o.material){(Array.isArray(o.material)?o.material:[o.material]).forEach((m)=>m.dispose?.());}}); container.classList.remove('ring-live','ring-held','ring-face-activated','ring-model-loaded','ring-model-fallback');
     }
     return {pulse,destroy,activateFace,beginHold:()=>hold.begin(),endHold:()=>hold.end()};
   } catch (error) {
