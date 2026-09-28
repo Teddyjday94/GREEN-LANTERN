@@ -12,7 +12,7 @@ const home=app.querySelector('.home-page'); if(!home) return;
 const hero=home.querySelector('#hero-visual');
 if(hero && !hero.dataset.xRing){
 hero.dataset.xRing='1'; hero.classList.add('x-ring-stage');
-const label=document.createElement('div'); label.className='x-ring-spec'; label.innerHTML='<span>POWER RING</span><small>Click the emblem to charge</small>'; hero.append(label);
+const label=document.createElement('div'); label.className='x-ring-spec'; label.innerHTML='<span>POWER RING</span><small>Press and hold to charge</small>'; hero.append(label);
 ringAbort?.abort(); ringController?.destroy?.(); ringAbort=new AbortController();
 ringController=await mountPowerRing({container:hero,reducedMotion,signal:ringAbort.signal});
 if(ringController && !reducedMotion) setTimeout(()=>ringController?.pulse(),1500);

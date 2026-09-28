@@ -1,4 +1,4 @@
-import { rm, mkdir, copyFile, writeFile } from 'node:fs/promises';
+import { rm, mkdir, copyFile, cp, writeFile } from 'node:fs/promises';
 import { lanternRecords } from '../expansion-data.mjs';
 const dist = new URL('../dist/', import.meta.url);
 await rm(dist,{recursive:true,force:true});
@@ -9,6 +9,12 @@ for (const file of ['index.html','styles.css','app.mjs','data.mjs','search.mjs',
 await mkdir(new URL('vendor/', dist), { recursive: true });
 await copyFile(new URL('../node_modules/three/build/three.module.js', import.meta.url), new URL('vendor/three.module.js', dist));
 await copyFile(new URL('../node_modules/three/build/three.core.js', import.meta.url), new URL('vendor/three.core.js', dist));
+await mkdir(new URL('vendor/loaders/collada/', dist), { recursive: true });
+await copyFile(new URL('../node_modules/three/examples/jsm/loaders/ColladaLoader.js', import.meta.url), new URL('vendor/loaders/ColladaLoader.js', dist));
+await copyFile(new URL('../node_modules/three/examples/jsm/loaders/TGALoader.js', import.meta.url), new URL('vendor/loaders/TGALoader.js', dist));
+await copyFile(new URL('../node_modules/three/examples/jsm/loaders/collada/ColladaParser.js', import.meta.url), new URL('vendor/loaders/collada/ColladaParser.js', dist));
+await copyFile(new URL('../node_modules/three/examples/jsm/loaders/collada/ColladaComposer.js', import.meta.url), new URL('vendor/loaders/collada/ColladaComposer.js', dist));
+await cp(new URL('../assets/', import.meta.url), new URL('assets/', dist), { recursive: true });
 const rawSite = process.env.SITE_URL || (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:4173');
 const site = rawSite.replace(/\/$/,'');
 const routes = ['','lanterns','corps','universe','spectrum','timeline','villains','reading','sources',...lanternRecords.map(l=>`lanterns/${l.slug}`)];

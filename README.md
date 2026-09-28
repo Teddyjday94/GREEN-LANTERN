@@ -4,9 +4,8 @@ An unofficial, noncommercial Green Lantern fan archive with a cinematic space in
 
 ## Run locally
 
-No package installation is required in this build.
-
 ```bash
+npm install
 npm run dev
 ```
 
