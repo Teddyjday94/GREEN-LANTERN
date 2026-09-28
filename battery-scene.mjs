@@ -17,11 +17,20 @@ export function getBatteryFitProfile({compact=false}={}) {
   return {fov:30,cameraZ:7.4,modelHeight:compact?3.15:3.45};
 }
 
+export function disposeBatteryResources({renderer,scene,materials}={}) {
+  scene?.traverse((node)=>node.geometry?.dispose?.());
+  materials?.forEach((material)=>material.dispose?.());
+  renderer?.dispose?.();
+  renderer?.domElement?.remove?.();
+}
+
 export async function mountPowerBattery({container,reducedMotion=false,compact=false,signal}={}) {
   if(!container || signal?.aborted) return null;
   const host=container.querySelector('.x-battery-model');
   const shell=container.querySelector('.x-central-battery');
   if(!host || !shell) return null;
+  let renderer=null,scene=null;
+  const materials=new Map();
   try {
     const [THREE,{OBJLoader}]=await Promise.all([
       import('/vendor/three.module.js'),
@@ -29,11 +38,11 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
     ]);
     if(signal?.aborted) return null;
     const profile=getBatteryMotionProfile({reducedMotion,compact});
-    const scene=new THREE.Scene();
+    scene=new THREE.Scene();
     const fit=getBatteryFitProfile({compact});
     const camera=new THREE.PerspectiveCamera(fit.fov,1,0.1,30);
     camera.position.set(0.15,0.2,fit.cameraZ);
-    const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});
+    renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});
     renderer.setPixelRatio(Math.min(globalThis.devicePixelRatio||1,compact?1.25:1.6));
     renderer.outputColorSpace=THREE.SRGBColorSpace;
     renderer.setClearColor(0x000000,0);
@@ -42,10 +51,15 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
 
     const object=await new OBJLoader().loadAsync('/assets/battery/green-lantern-power-battery.obj');
     if(signal?.aborted) {
-      object.traverse((node)=>node.geometry?.dispose?.());
-      renderer.dispose(); renderer.domElement.remove(); return null;
+      object.traverse((node)=>{
+        node.geometry?.dispose?.();
+        const nodeMaterials=Array.isArray(node.material)?node.material:[node.material];
+        nodeMaterials.forEach((material)=>material?.dispose?.());
+      });
+      disposeBatteryResources({renderer,scene,materials});
+      return null;
     }
-    const materials=new Map();
+    const group=new THREE.Group(); group.add(object); scene.add(group);
     const getMaterial=(name)=>{
       if(materials.has(name)) return materials.get(name);
       const material=new THREE.MeshStandardMaterial(getBatteryMaterialProfile(name));
@@ -57,11 +71,11 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
       const originals=Array.isArray(node.material)?node.material:[node.material];
       node.material=originals.map((material)=>getMaterial(material?.name||''));
       if(node.material.length===1) node.material=node.material[0];
+      originals.forEach((material)=>material?.dispose?.());
       node.castShadow=false;
       node.receiveShadow=false;
     });
     object.rotation.x=-Math.PI/2;
-    const group=new THREE.Group(); group.add(object); scene.add(group);
     const initialBox=new THREE.Box3().setFromObject(object);
     const size=initialBox.getSize(new THREE.Vector3());
     const scale=fit.modelHeight/Math.max(size.x,size.y,size.z,1);
@@ -76,7 +90,7 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
     const core=new THREE.PointLight(0x3dff8a,profile.animatedGlow?32:22,10,2); core.position.set(0,0.25,2.8); scene.add(core);
     const floor=new THREE.PointLight(0x0cff63,18,8,2); floor.position.set(0,-2.4,1.4); scene.add(floor);
 
-    let pointerYaw=0,raf=0,first=true;
+    let pointerYaw=0,raf=0,first=true,destroyed=false;
     const pointer=(event)=>{
       const rect=container.getBoundingClientRect();
       const normalized=Math.max(-1,Math.min(1,((event.clientX-rect.left)/rect.width-.5)*2));
@@ -100,16 +114,17 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
     };
     raf=requestAnimationFrame(tick);
     function destroy(){
+      if(destroyed) return;
+      destroyed=true;
       cancelAnimationFrame(raf);
       container.removeEventListener('pointermove',pointer);
       globalThis.removeEventListener?.('resize',resize);
-      scene.traverse((node)=>node.geometry?.dispose?.());
-      materials.forEach((material)=>material.dispose());
-      renderer.dispose(); renderer.domElement.remove();
+      disposeBatteryResources({renderer,scene,materials});
       shell.classList.remove('is-model-loaded');
     }
     return {destroy};
   } catch(error) {
+    disposeBatteryResources({renderer,scene,materials});
     console.warn('Uploaded Central Power Battery model unavailable; retaining illustrated fallback.',error);
     shell.classList.add('is-model-fallback');
     return null;

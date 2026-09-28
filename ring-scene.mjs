@@ -20,9 +20,9 @@ export function getRingHoldProfile({reducedMotion=false}={}) {
     : { idleEmissive:0.15, heldEmissive:4.2, heldLight:62, animateEffects:true };
 }
 
-export function getRingRotationTarget({normalizedX=0,normalizedY=0,mobile=false}={}) {
-  const x=Math.max(-1,Math.min(1,normalizedX));
-  const y=Math.max(-1,Math.min(1,normalizedY));
+export function getRingRotationTarget({normalizedX=0,normalizedY=0,mobile=false,reducedMotion=false}={}) {
+  const x=reducedMotion?0:Math.max(-1,Math.min(1,normalizedX));
+  const y=reducedMotion?0:Math.max(-1,Math.min(1,normalizedY));
   return {
     x:0.68+y*(mobile?0.58:0.72),
     y:0.12+x*(mobile?0.92:1.15),
@@ -97,7 +97,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
 
     const group=new THREE.Group(); scene.add(group);
     const mobile=(container.clientWidth||innerWidth)<720;
-    let rotationTarget=getRingRotationTarget({mobile});
+    let rotationTarget=getRingRotationTarget({mobile,reducedMotion});
     group.rotation.set(rotationTarget.x,rotationTarget.y,rotationTarget.z);
     const fallback=new THREE.Group(); group.add(fallback);
 
@@ -204,7 +204,7 @@ export async function mountPowerRing({container,reducedMotion=false,signal}={}) 
     const raycaster=new THREE.Raycaster();
     const pointerNdc=new THREE.Vector2();
     let scrollY=0,pulseBoost=0,pulseStart=0,raf=0,first=true;
-    const pointer=(e)=>{ const rect=container.getBoundingClientRect(); rotationTarget=getRingRotationTarget({normalizedX:((e.clientX-rect.left)/rect.width-.5)*2,normalizedY:((e.clientY-rect.top)/rect.height-.5)*2,mobile}); };
+    const pointer=(e)=>{ const rect=container.getBoundingClientRect(); rotationTarget=getRingRotationTarget({normalizedX:((e.clientX-rect.left)/rect.width-.5)*2,normalizedY:((e.clientY-rect.top)/rect.height-.5)*2,mobile,reducedMotion}); };
     const activateFace=()=>{ pulseBoost=Math.max(pulseBoost,clickProfile.emissiveBoost); pulseStart=performance.now(); container.classList.remove('ring-face-activated'); void container.offsetWidth; container.classList.add('ring-face-activated'); setTimeout(()=>container.classList.remove('ring-face-activated'),clickProfile.rippleDuration); };
     const hold=createRingHoldController({onChange:(held)=>{
       container.classList.toggle('ring-held',held);

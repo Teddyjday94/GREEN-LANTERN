@@ -13,3 +13,8 @@ test('pointer travel exposes the ring face with substantially wider pitch and ya
   assert.ok(Math.abs(right.y-center.y)>=0.8,'horizontal travel should produce clear yaw');
   assert.ok(Math.abs(down.x-center.x)>=0.5,'vertical travel should produce clear pitch');
 });
+test('reduced motion keeps the face-forward ring pose static during pointer travel',()=>{
+  const center=ringScene.getRingRotationTarget({normalizedX:0,normalizedY:0,reducedMotion:true});
+  const edge=ringScene.getRingRotationTarget({normalizedX:1,normalizedY:1,reducedMotion:true});
+  assert.deepEqual(edge,center);
+});

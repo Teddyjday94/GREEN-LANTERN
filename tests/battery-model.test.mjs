@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { BufferGeometry, Mesh, MeshStandardMaterial, Scene } from 'three';
 
 const batteryScene=await import('../battery-scene.mjs').catch(()=>({}));
 
@@ -35,4 +36,20 @@ test('supplied battery mesh is present with real geometry',async()=>{
   assert.match(model,/^v\s+[-\d]/m);
   assert.match(model,/^f\s+\d/m);
   assert.ok(model.length>500_000);
+});
+
+test('battery resource cleanup releases WebGL, geometry and material allocations',()=>{
+  assert.equal(typeof batteryScene.disposeBatteryResources,'function');
+  const scene=new Scene();
+  const geometry=new BufferGeometry();
+  const material=new MeshStandardMaterial();
+  scene.add(new Mesh(geometry,material));
+  let geometryDisposed=0,materialDisposed=0,rendererDisposed=0,canvasRemoved=0;
+  geometry.addEventListener('dispose',()=>{geometryDisposed+=1;});
+  material.addEventListener('dispose',()=>{materialDisposed+=1;});
+  const renderer={dispose(){rendererDisposed+=1;},domElement:{remove(){canvasRemoved+=1;}}};
+
+  batteryScene.disposeBatteryResources({renderer,scene,materials:new Set([material])});
+
+  assert.deepEqual({geometryDisposed,materialDisposed,rendererDisposed,canvasRemoved},{geometryDisposed:1,materialDisposed:1,rendererDisposed:1,canvasRemoved:1});
 });
