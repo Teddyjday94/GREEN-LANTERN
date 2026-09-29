@@ -67,6 +67,31 @@ test('battery oath activation restarts and plays the supplied clip',async()=>{
   assert.equal(audio.currentTime,0);
 });
 
+test('battery energized state follows oath playback and clears when the clip ends',async()=>{
+  assert.equal(typeof batteryScene.createBatteryAudioController,'function');
+  class TestAudio extends EventTarget {
+    currentTime=7;
+    play(){ return Promise.resolve(); }
+    pause(){ this.dispatchEvent(new Event('pause')); }
+  }
+  const audio=new TestAudio();
+  const activeStates=[];
+  const controller=batteryScene.createBatteryAudioController({
+    audio,
+    onActiveChange:(active)=>activeStates.push(active),
+  });
+
+  await controller.activate();
+  assert.deepEqual(activeStates,[true]);
+  audio.dispatchEvent(new Event('ended'));
+  assert.deepEqual(activeStates,[true,false]);
+
+  await controller.activate();
+  controller.destroy();
+  assert.deepEqual(activeStates,[true,false,true,false]);
+  assert.equal(audio.currentTime,0);
+});
+
 test('battery oath binding works without WebGL and ignores keyboard auto-repeat',async()=>{
   assert.equal(typeof batteryScene.bindBatteryAudio,'function');
   const target=new EventTarget();

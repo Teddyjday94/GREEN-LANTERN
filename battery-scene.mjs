@@ -17,26 +17,50 @@ export function getBatteryFitProfile({compact=false}={}) {
   return {fov:30,cameraZ:7.4,modelHeight:compact?3.15:3.45};
 }
 
-export function createBatteryAudioController({audio}={}) {
-  let destroyed=false;
+export function createBatteryAudioController({audio,onActiveChange=()=>{}}={}) {
+  let destroyed=false,active=false,activationId=0;
+  const setActive=(next)=>{
+    const value=Boolean(next);
+    if(value===active) return;
+    active=value;
+    onActiveChange(active);
+  };
+  const deactivate=()=>setActive(false);
+  audio?.addEventListener?.('ended',deactivate);
+  audio?.addEventListener?.('pause',deactivate);
+  audio?.addEventListener?.('error',deactivate);
   return {
     async activate(){
       if(destroyed || !audio) return false;
+      const requestId=++activationId;
       audio.currentTime=0;
-      try { await audio.play(); return true; }
-      catch { return false; }
+      try {
+        await audio.play();
+        if(destroyed || requestId!==activationId) return false;
+        setActive(true);
+        return true;
+      }
+      catch {
+        if(requestId===activationId) setActive(false);
+        return false;
+      }
     },
     destroy(){
       if(destroyed) return;
       destroyed=true;
+      activationId+=1;
+      audio?.removeEventListener?.('ended',deactivate);
+      audio?.removeEventListener?.('pause',deactivate);
+      audio?.removeEventListener?.('error',deactivate);
+      setActive(false);
       audio?.pause?.();
       if(audio) audio.currentTime=0;
     },
   };
 }
 
-export function bindBatteryAudio({target,audio}={}) {
-  const controller=createBatteryAudioController({audio});
+export function bindBatteryAudio({target,audio,onActiveChange}={}) {
+  const controller=createBatteryAudioController({audio,onActiveChange});
   const activate=()=>{ void controller.activate(); };
   const keyActivate=(event)=>{
     if(event.repeat || (event.key!=='Enter' && event.key!==' ')) return;
@@ -66,7 +90,11 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
   const host=container.querySelector('.x-battery-model');
   const shell=container.querySelector('.x-central-battery');
   if(!host || !shell) return null;
-  const audioBinding=bindBatteryAudio({target:shell,audio:shell.querySelector('.x-battery-oath')});
+  const audioBinding=bindBatteryAudio({
+    target:shell,
+    audio:shell.querySelector('.x-battery-oath'),
+    onActiveChange:(active)=>shell.classList.toggle('is-oath-active',active),
+  });
   let renderer=null,scene=null;
   const materials=new Map();
   try {
@@ -160,13 +188,13 @@ export async function mountPowerBattery({container,reducedMotion=false,compact=f
       audioBinding.destroy();
       globalThis.removeEventListener?.('resize',resize);
       disposeBatteryResources({renderer,scene,materials});
-      shell.classList.remove('is-model-loaded');
+      shell.classList.remove('is-model-loaded','is-oath-active');
     }
     return {destroy};
   } catch(error) {
     disposeBatteryResources({renderer,scene,materials});
     console.warn('Uploaded Central Power Battery model unavailable; retaining the ambient Oa scene.',error);
     shell.classList.add('is-model-unavailable');
-    return {destroy(){ audioBinding.destroy(); shell.classList.remove('is-model-unavailable'); }};
+    return {destroy(){ audioBinding.destroy(); shell.classList.remove('is-model-unavailable','is-oath-active'); }};
   }
 }
